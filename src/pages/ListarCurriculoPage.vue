@@ -1,9 +1,24 @@
 <template>
 <div class ="q-ma-lg">
    <h5 class = "text-h5 text-weight-bold"> Listar Curriculos</h5>
-    
+   <div class="q-pa-md">
+    <div class="q-gutter-md" style="max-width: 300px">
+      <q-form @submit="onSubmit" class="q-gutter-md">
+        <q-input v-model="form.first_name" label="Primeiro nome"/>
+      <q-input v-model="form.last_name" label="Último Nome"/>
+      <q-input v-model="form.email" label="E-mail"/>
+    </div>
+    <q-btn label = "Enviar" type="submit" color ="primary"/>
+    <q-btn
+    label="limpar"
+    type="reset"
+    color = "primary"
+    flat
+    class="q-ml-sm" 
+    />
 
     <div class="q-ma-lg" style="max-width: 500px">
+    
     <q-list bordered separator>
       <q-item
       clickable
@@ -21,45 +36,53 @@
     </q-list>
     </div>
 </div>
+</div>
    
 </template>
 
 <script>
-import{ref} from "vue";
+import{onMounted, ref} from "vue";
+import{userMeta} from "quasar";
+import curriculoService from "src/services/CurriculoService"
+
+const metaData = {
+    title: "Listar Curriculo",
+    titleTemplate: (title) => `${title} - App Curriculo`,
+};
 
 export default {
     setup () {
-        const curriculos = ref([
-            {
-            id: 1, 
-            first_name: "Arthur",
-            last_name: "vinicius",
-            email:"arthur@gmail.com",
-            confirmado: 1,
+        userMeta (metaData);
+        const Curriculos= ref([{}]);
+        const form = ref({});
 
-        },
-        {
-            id: 2, 
-            first_name: "Antonio",
-            last_name: "Gabriel",
-            email:"antonio7@gmail.com",
-            confirmado: 0,
 
-        },
-        {
-            id: 3, 
-            first_name: "hilton",
-            last_name: "gabriel",
-            email:"hilton@gmail.com",
-            confirmado: 1,
 
-        },
-        ]);
-        return {curriculos}; 
-    }
+        const{ listar, salvar } = curriculoService();
+        const listarCurriculos= async () => {
+            curriculos.value = await listar();
+        };
+     
+     const onSubmit = async () =>{
+        await salvar (form.value);
+        listarCurriculos();
+        catch (error){
+
+        }
+
+     }
+        onMounted(() => {
+        listarCurriculos();
+
+     });
+
+     return {
+        curriculos,
+        form,
+     };
+
+    },
 };
 </script>
 
-<style lang="css" scoped>
-
-</style>
+<style lang="css" scoped></style>
